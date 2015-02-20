@@ -6,7 +6,8 @@ from thread import start_new_thread
 import sys
 import picamera
 
-host = "192.168.178.36"
+#host = "192.168.178.36" #macbook air on local network
+host = "192.168.178.24" #thoughpad on local network
 port = 8888
 
 def start_stream(socket):
