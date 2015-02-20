@@ -11,9 +11,10 @@ port = 8888
 
 def start_stream(socket):
 	file_socket = socket.makefile('wb')
-	with picamera.PiCamera() as camera:
-		camera.start_recording(file_socket, format='h264', quality=23)
-		camera.wait_recording(15)
+	with picamera.PiCamera(resolution=(1920, 1080)) as camera:
+		camera.start_recording(file_socket, format='h264')
+		while(1):
+			camera.wait_recording(15)
 		camera.stop_recording()
 
 
@@ -21,11 +22,13 @@ def establish_connection():
 	global port
 	global host
 	s = socket.socket()
-	try:
-		s.connect((host, port))
-	except(socket.error):
-		print("error: connection failed")
-
+	while(1):
+		try:
+			s.connect((host, port))
+			break
+		except(socket.error):
+			print("error: connection failed")
+			continue
 	return s
 
 socket = establish_connection()
