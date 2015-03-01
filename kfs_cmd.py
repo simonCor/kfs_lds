@@ -11,16 +11,28 @@ class Kfs_cmd(cmd.Cmd):
 		self.stdout = file_socket
 		self.camera = camera
 
+	def start_command_interface(self, socket):
+		while(1):
+			self.cmdloop()
+
 	def do_help(self, s):
 		self.stdout.write("Hi iam help\n")
 
 	def do_brightness(self, level):
 		"""brightness [level]
 		set brightness level"""
-		self.stdout.write("Hi iam brightness. " + level + "\n")
 		try:
 			self.camera.brightness = int(level)
+			self.stdout.write("done\n")
 		except picamera.exc.PiCameraValueError as e:
-			self.stdout.write(e + "\n")
+			self.stdout.write(str(e) + "\n")
 
-
+	def do_res(self, res):
+		"""brightness [level]
+		set brightness level"""
+		try:
+			(x,y) = str.split(res)
+			self.camera.resolution = (int(x), int(y))
+			self.stdout.write("done\n")
+		except picamera.exc.PiCameraValueError as e:
+			self.stdout.write(str(e) + "\n")

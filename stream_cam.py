@@ -6,11 +6,13 @@ import thread
 import sys
 import picamera
 import kfs_cmd
+import kfs_socket
 
 host = "192.168.178.36" #macbook air on local network
 #host = "192.168.178.24" #thoughpad on local network
 stream_port = 8888
 cmd_port = 8889
+
 
 def connect_socket(host, port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,21 +27,17 @@ def connect_command_socket():
 def connect_stream_socket():
 	global stream_port
 	global host
-	return connect_socket(host, stream_port)
+	s = kfs_socket.Kfs_socket(host = host, port = stream_port, family = socket.AF_INET,
+		type = socket.SOCK_STREAM)
+	return s
 
-def start_stream(stream_socket, cmd_socket):
-	file_socket = stream_socket.makefile('wb')
-	with picamera.PiCamera(resolution=(1920, 1080)) as camera:
-		camera.start_recording(file_socket, format='h264')
-		while(1):
-			cmdl = kfs_cmd.Kfs_cmd(cmd_socket, camera)
-			cmdl.cmdloop()
-		camera.stop_recording()
-
-def start_command_interface(socket, stream_thread):
+def start_stream(stream_socket, cmd_socket, camera):
+	camera.start_recording(stream_socket, format='h264')
 	while(1):
-		cmdl = kfs_cmd.Kfs_cmd(socket)
-		cmdl.cmdloop()
+		camera.wait_recording(60)
+	camera.stop_recording()
+
+
 
 def establish_connection():
 	while(1):
@@ -54,8 +52,12 @@ def establish_connection():
 
 
 (ss, cs) = establish_connection()
+camera = picamera.PiCamera(resolution=(1920, 1080))
 
-st = thread.start_new_thread(start_stream, (ss, cs))
+st = thread.start_new_thread(start_stream, (ss, cs, camera))
+
+cmdl = kfs_cmd.Kfs_cmd(socket = cs, camera = camera)
+st = thread.start_new_thread(cmdl.start_command_interface, (ss,))
 
 while(1):
 	pass
