@@ -28,7 +28,7 @@ def connect_stream_socket():
 	global stream_port
 	global host
 	s = kfs_socket.Kfs_socket(host = host, port = stream_port, family = socket.AF_INET,
-		type = socket.SOCK_STREAM)
+		type = socket.SOCK_DGRAM)
 	return s
 
 def start_stream(stream_socket, cmd_socket, camera):
@@ -46,7 +46,7 @@ def establish_connection():
 			ss = connect_stream_socket()
 			break
 		except(socket.error):
-			#print("error: connection failed")
+			print("error: connection failed")
 			continue
 	return(ss, cs)
 
