@@ -28,7 +28,7 @@ def connect_stream_socket():
 	global stream_port
 	global host
 	s = kfs_socket.Kfs_socket(host = host, port = stream_port, family = socket.AF_INET,
-		type = socket.SOCK_DGRAM)
+		type = socket.SOCK_STREAM)
 	return s
 
 def start_stream(stream_socket, cmd_socket, camera):
