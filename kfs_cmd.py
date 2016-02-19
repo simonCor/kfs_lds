@@ -16,7 +16,10 @@ class Kfs_cmd(cmd.Cmd):
 			self.cmdloop()
 
 	def do_help(self, s):
-		self.stdout.write("The follwoing commands are available:\n")
+		self.stdout.write("The followoing commands are available:\n")
+
+	def help_brightness(self):
+		print 'brightness [level] set brightness level'
 
 	def do_brightness(self, level):
 		"""brightness [level]
@@ -28,8 +31,7 @@ class Kfs_cmd(cmd.Cmd):
 			self.stdout.write(str(e) + "\n")
 
 	def do_res(self, res):
-		"""brightness [level]
-		set brightness level"""
+		'brightness [level] set brightness level'
 		try:
 			(x,y) = str.split(res)
 			self.camera.resolution = (int(x), int(y))
