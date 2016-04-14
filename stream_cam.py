@@ -7,13 +7,12 @@ import sys
 import picamera
 import kfs_cmd
 import kfs_socket
-from daemonize import Daemonize
 
 host = "192.168.178.36" #macbook air on local network
 #host = "192.168.178.24" #thoughpad on local network
 stream_port = 8888
 cmd_port = 8889
-pid = "/tmp/test.pid"
+
 
 def connect_socket(host, port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -51,14 +50,14 @@ def establish_connection():
 			continue
 	return(ss, cs)
 
-def main():
-	(ss, cs) = establish_connection()
-	camera = picamera.PiCamera(resolution=(1920, 1080))
 
-	st = thread.start_new_thread(start_stream, (ss, cs, camera))
+(ss, cs) = establish_connection()
+camera = picamera.PiCamera(resolution=(1920, 1080))
 
-	cmdl = kfs_cmd.Kfs_cmd(socket = cs, camera = camera)
-	st = thread.start_new_thread(cmdl.start_command_interface, (ss,))
+st = thread.start_new_thread(start_stream, (ss, cs, camera))
 
-daemon = Daemonize(app="test_app", pid=pid, action=main)
-daemon.start()
+cmdl = kfs_cmd.Kfs_cmd(socket = cs, camera = camera)
+st = thread.start_new_thread(cmdl.start_command_interface, (ss,))
+
+while(1):
+	pass
