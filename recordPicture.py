@@ -3,6 +3,8 @@ import os
 import shelve
 from time import sleep
 from os.path import expanduser
+import piexif
+from PIL import Image
 
 camera = picamera.PiCamera()
 
@@ -33,14 +35,21 @@ def setupFolders():
 	
 
 def getPicture(folder, i):
-    camera.capture(folder + "/" + str(i) + '.jpg')
-    sleep(3)
+    image = folder + "/" + str(i) + ".jpg"
+    camera.capture(image)
+    return image
+
+def addExifData(image):
+    im = Image.open(image)
+    exif = piexif.load(im.info["exif"])
+    print(exif["0th"])
 
 path = setupFolders();
 i = 0;
 while(True):
     print("Take picture " + str(i))
-    getPicture(path, i);
+    image = getPicture(path, i);
+    addExifData(image)
     sleep(3);
     i = i + 1;
 
