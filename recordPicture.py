@@ -5,6 +5,7 @@ from time import sleep
 from os.path import expanduser
 import piexif
 from PIL import Image
+import BwDrone
 
 camera = picamera.PiCamera()
 
@@ -39,17 +40,20 @@ def getPicture(folder, i):
     camera.capture(image)
     return image
 
-def addExifData(image):
+def addExifData(image, position):
     im = Image.open(image)
     exif = piexif.load(im.info["exif"])
     print(exif["0th"])
 
 path = setupFolders();
 i = 0;
+drone = BwDrone.BwDrone()
+drone.connect()
 while(True):
     print("Take picture " + str(i))
     image = getPicture(path, i);
-    addExifData(image)
+    position = drone.getPosition()
+    addExifData(image, position)
     sleep(3);
     i = i + 1;
 
