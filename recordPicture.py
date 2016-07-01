@@ -3,8 +3,7 @@ import os
 import shelve
 from time import sleep
 from os.path import expanduser
-import piexif
-from PIL import Image
+from gi.repository import GExiv2
 import BwDrone
 
 camera = picamera.PiCamera()
@@ -41,11 +40,12 @@ def getPicture(folder, i):
     return image
 
 def addExifData(image, position):
-    im = Image.open(image)
-    exif = piexif.load(im.info["exif"])
-    print(exif["0th"])
+    exif = GExiv2.Metadata(image)
+    exif.set_gps_info(position.lon, position.lat, position.alt)
+    exif.save_file()
 
 path = setupFolders();
+print("Writing to " + path)
 i = 0;
 drone = BwDrone.BwDrone()
 drone.connect()
