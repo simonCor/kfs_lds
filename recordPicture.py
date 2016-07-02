@@ -5,7 +5,8 @@ from time import sleep
 from os.path import expanduser
 from gi.repository import GExiv2
 import BwDrone
-
+import shutil
+minFreeSpace = 500000000
 camera = picamera.PiCamera()
 
 def setupFolders():
@@ -31,7 +32,7 @@ def setupFolders():
     f.close();
     currMissionFolder = missionFolder + "/" + str(number)
     os.mkdir(currMissionFolder);
-    return currMissionFolder
+    return(currMissionFolder, missionFolder, number)
 	
 
 def getPicture(folder, i):
@@ -44,7 +45,24 @@ def addExifData(image, position):
     exif.set_gps_info(position.lon, position.lat, position.alt)
     exif.save_file()
 
-path = setupFolders();
+def checkDiskSpaceAndClean(baseFolder, currentMissionNumber):
+    stat = os.statvfs(baseFolder)
+    freeSpace = stat.f_bfree*stat.f_bsize
+    print("Available space: " + str(freeSpace))
+    while(freeSpace < minFreeSpace):
+        oldestMissionNumber = currentMissionNumber
+        for folder in os.listdir(baseFolder):
+            number = 0
+            try:
+                if(int(folder) < oldestMissionNumber):
+                    oldestMissionNumber = int(folder)
+            except ValueError:
+                continue
+        if(oldestMissionNumber != currentMissionNumber):
+            print("Remove " + baseFolder+ "/" + str(oldestMissionNumber))
+            shutil.rmtree(baseFolder + "/" + str(oldestMissionNumber))
+
+path, baseFolder, missionNumber = setupFolders();
 print("Writing to " + path)
 i = 0;
 drone = BwDrone.BwDrone()
@@ -54,6 +72,7 @@ while(True):
     image = getPicture(path, i);
     position = drone.getPosition()
     addExifData(image, position)
+    checkDiskSpaceAndClean(baseFolder, missionNumber)
     sleep(3);
     i = i + 1;
 
