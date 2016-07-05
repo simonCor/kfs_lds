@@ -1,6 +1,6 @@
 import sys, os
 
-dronekitPath = os.getcwd() + '/dronekit-python'
+dronekitPath = os.path.dirname(os.path.realpath(__file__)) + '/dronekit-python'
 print "Import path: " + dronekitPath
 sys.path.append(dronekitPath)
 from dronekit import connect, VehicleMode
