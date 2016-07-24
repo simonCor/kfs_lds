@@ -6,6 +6,10 @@ from os.path import expanduser
 from gi.repository import GExiv2
 import BwDrone
 import shutil
+
+#Set to True when DroneKit shall be used
+useDroneKit = True
+
 minFreeSpace = 500000000
 camera = picamera.PiCamera()
 
@@ -65,13 +69,15 @@ def checkDiskSpaceAndClean(baseFolder, currentMissionNumber):
 path, baseFolder, missionNumber = setupFolders();
 print("Writing to " + path)
 i = 0;
-drone = BwDrone.BwDrone()
-drone.connect()
+if(useDroneKit): 
+    drone = BwDrone.BwDrone()
+    drone.connect()
 while(True):
     print("Take picture " + str(i))
     image = getPicture(path, i);
-    position = drone.getPosition()
-    addExifData(image, position)
+    if(useDroneKit):
+        position = drone.getPosition()
+        addExifData(image, position)
     checkDiskSpaceAndClean(baseFolder, missionNumber)
     sleep(3);
     i = i + 1;
